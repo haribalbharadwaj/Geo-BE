@@ -1,9 +1,11 @@
+// Import necessary modules
 const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
 const cors = require('cors');
-const jwt = require('jsonwebtoken'); // Include this if not already
-const bcrypt = require('bcrypt'); // Include bcrypt if needed for hashing
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+
 // Import routes
 const userRoutes = require('./routes/userRoutes');
 const fileRoutes = require('./routes/fileRoutes');
@@ -16,7 +18,12 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json({ limit: '50mb' }))
+app.use(express.json({ limit: '50mb' }));
+
+// Root route
+app.get('/', (req, res) => {
+  res.send('Welcome to the GeoSpatial Data Application API');
+});
 
 // Routes
 app.use('/api/users', userRoutes);
@@ -26,7 +33,6 @@ app.use('/api/markers', markerRoutes);
 app.use('/api/maps', mapsRoute);
 
 app.use('/uploads', express.static('uploads'));
-
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
