@@ -9,9 +9,6 @@ const bcrypt = require('bcrypt');
 // Import routes
 const userRoutes = require('./routes/userRoutes');
 const fileRoutes = require('./routes/fileRoutes');
-const shapeRoutes = require('./routes/shapeRoutes');
-const markerRoutes = require('./routes/markerRoutes');
-const mapsRoute = require('./routes/mapsRoute');
 
 // Create the app
 const app = express();
@@ -28,9 +25,6 @@ app.get('/', (req, res) => {
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/files', fileRoutes);
-app.use('/api/shapes', shapeRoutes);
-app.use('/api/markers', markerRoutes);
-app.use('/api/maps', mapsRoute);
 
 app.use('/uploads', express.static('uploads'));
 
