@@ -15,7 +15,7 @@ router.get('/', authMiddleware, fileController.getFiles);
 
 // Save map data (GeoJSON, KML, TIFF, etc.) to the server
 // Update map data on the server
-router.put('/update/:id', authMiddleware, fileController.updateMap);
+router.post('/update/:id', authMiddleware, fileController.updateMap);
 
 // Fetch a file by its ID
 router.get('/:id', authMiddleware, fileController.getFileById);
