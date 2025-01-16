@@ -40,9 +40,16 @@ exports.saveMap = async (req, res) => {
     const { mapData, filename } = req.body;
     const user = req.user; 
 
+    if (!filename || !mapData) {
+      return res.status(400).json({ message: 'Filename and mapData are required' });
+    }
+
     const validFilename = filename || 'Unnamed_Map';
     const uploadDir = path.join(__dirname, '../uploads');
     const filePath = path.join(uploadDir, `${validFilename}.geojson`);
+
+    fs.writeFileSync(filePath, JSON.stringify(mapData), 'utf8');
+
 
     // Ensure uploads directory exists
     if (!fs.existsSync(uploadDir)) {
@@ -57,7 +64,8 @@ exports.saveMap = async (req, res) => {
       filename: validFilename,
       filepath: filePath,
       fileType: 'GeoJSON',
-      user: user._id
+      user: user._id,
+      geoJSON: mapData // Add the geoJSON data directly to the database
     });
 
     await newFile.save();
@@ -227,18 +235,32 @@ exports.updateMap = async (req, res) => {
       return res.status(404).json({ error: 'Map not found' });
     }
 
+    const uploadDir = path.join(__dirname, '../uploads');
+    const oldFilePath = file.filepath;  // Old file path before update
+
     if (mapData) {
-      file.mapData = mapData;
+      file.geoJSON = mapData;
+
+      // Update the content of the file in the uploads directory
+      fs.writeFileSync(oldFilePath, JSON.stringify(mapData), 'utf8');
     }
 
-    if (filename) {
+    if (filename && filename !== file.filename) {
+      const newFilePath = path.join(uploadDir, `${filename}.geojson`);
+
+      // Rename the file in the uploads directory if the filename changes
+      fs.renameSync(oldFilePath, newFilePath);
+
+      // Update the file's filename and filepath in the database
       file.filename = filename;
+      file.filepath = newFilePath;
     }
 
     await file.save();
 
     res.status(200).json({ message: 'Map updated successfully', file });
   } catch (error) {
-    res.status(500).json({ error: 'Error updating map' });
+    console.error('Error updating map:', error);
+    res.status(500).json({ error: 'Error updating map', details: error.message });
   }
 };
